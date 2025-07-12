@@ -7,7 +7,7 @@
         #ifndef CROCKET_WINDOWS
             #define CROCKET_WINDOWS
         #endif
-    #elif define(__linux__)
+    #elif defined(__linux__)
         #ifndef CROCKET_LINUX
             #define CROCKET_LINUX
         #endif
