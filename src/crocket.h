@@ -20,6 +20,8 @@
         #define CROCKET_API WINAPI
     #endif
 
+    typedef SOCKET CROCKET_SOCKET;
+
     #ifndef CROCKET_SOCKET_ERROR
         #define CROCKET_SOCKET_ERROR SOCKET_ERROR
     #endif
@@ -27,8 +29,6 @@
     #ifndef CROCKET_INVALID_SOCKET
         #define CROCKET_INVALID_SOCKET INVALID_SOCKET
     #endif
-
-    typedef SOCKET CROCKET_SOCKET;
 #elif defined(CROCKET_LINUX)
     #include <errno.h>
 
@@ -36,15 +36,15 @@
         #define CROCKET_API
     #endif
 
+    typedef unsigned long long CROCKET_SOCKET;
+
     #ifndef CROCKET_SOCKET_ERROR
         #define CROCKET_SOCKET_ERROR (-1)
     #endif
 
     #ifndef CROCKET_INVALID_SOCKET
-        #define CROCKET_INVALID_SOCKET (unsigned long long)(~0)
+        #define CROCKET_INVALID_SOCKET (CROCKET_SOCKET)(~0)
     #endif
-
-    typedef unsigned long long CROCKET_SOCKET;
 #endif
 
 typedef CROCKET_SOCKET crocket_socket_t;
