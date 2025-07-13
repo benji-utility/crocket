@@ -30,6 +30,8 @@
 
     typedef SOCKET CROCKET_SOCKET;
 #elif defined(CROCKET_LINUX)
+    #include <errno.h>
+
     #ifndef CROCKET_API
         #define CROCKET_API
     #endif
@@ -45,30 +47,15 @@
     typedef unsigned long long CROCKET_SOCKET;
 #endif
 
-typedef CROCKET_SOCKET socket_t;
+typedef CROCKET_SOCKET crocket_socket_t;
 
-#ifdef _WIN32
-    CROCKET_API static inline bool winsock_init() {
-        struct WSAData wsa_data;
+static bool _crocket_is_winsock_initialized = false;
 
-        if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_ERROR_NONE) {
-            _update_error_context(WSAGetLastError(), "WSAStartup() failed");
-
-            return false;
-        }
-
-        return true;
-    }
-
-    CROCKET_API static inline bool winsock_cleanup() {
-        if (WSACleanup() != CROCKET_ERROR_NONE) {
-            _update_error_context(WSAGetLastError(), "WSACleanup() failed");
-
-            return false;
-        }
-
-        return true;
-    }
+#ifdef CROCKET_WINDOWS
+    CROCKET_API bool winsock_init();
+    CROCKET_API bool winsock_cleanup();
 #endif
+
+CROCKET_API bool crocket_socket_init(crocket_socket_t* _socket);
 
 #endif
