@@ -52,7 +52,7 @@ typedef CROCKET_SOCKET socket_t;
         struct WSAData wsa_data;
 
         if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_ERROR_NONE) {
-            _update_error_context(GetLastError(), "WSAStartup() failed");
+            _update_error_context(WSAGetLastError(), "WSAStartup() failed");
 
             return false;
         }
@@ -62,7 +62,7 @@ typedef CROCKET_SOCKET socket_t;
 
     CROCKET_API static inline bool winsock_cleanup() {
         if (WSACleanup() != CROCKET_ERROR_NONE) {
-            _update_error_context(GetLastError(), "WSACleanup() failed");
+            _update_error_context(WSAGetLastError(), "WSACleanup() failed");
 
             return false;
         }
