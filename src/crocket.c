@@ -71,12 +71,16 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
     }
 
     // set to placeholder value till true assignment during binding
-    sock->port = CROCKET_SOCKET_PLACEHOLDER_VALUE;
+    sock->port = CROCKET_SOCKET_PORT_PLACEHOLDER_VALUE;
 
     return true;
 }
 
-CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock) {
+CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock) {
+    crocket_socket_bind_to(sock, CROCKET_SOCKET_EPHEMERAL_PORT);
+}
+
+CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t port) {
     #if defined(CROCKET_WINDOWS)
         if (!_crocket_is_winsock_initialized) {
             _update_error_context(
@@ -100,6 +104,8 @@ CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock) {
         address.sin_addr.s_addr = INADDR_ANY;
     #endif
 
+    socket_address.sin_port = htons(port);
+
     if (bind(sock->self, (struct sockaddr*) &socket_address, sizeof(socket_address)) == SOCKET_ERROR) {
         #if defined(CROCKET_WINDOWS)
             _update_error_context(
@@ -113,16 +119,19 @@ CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock) {
         return false;
     }
 
-    socklen_t socket_address_length = sizeof(socket_address);
+    if (port == CROCKET_SOCKET_EPHEMERAL_PORT) {
+        socklen_t socket_address_length = sizeof(socket_address);
 
-    getsockname(sock->self, (struct sockaddr*) &socket_address, &socket_address_length);
+        getsockname(sock->self, (struct sockaddr*) &socket_address, &socket_address_length);
 
-    sock->port = ntohs(socket_address.sin_port);
+        sock->port = socket_address.sin_port;
+    }
+    else {
+        sock->port = port;
+    }
 
     return true;
 }
-
-CROCKET_API bool crocket_socket_bind_to_set(crocket_socket_t* sock, const uint16_t port);
 
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
     #ifdef CROCKET_WINDOWS

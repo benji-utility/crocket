@@ -18,7 +18,7 @@ int main(void) {
 
     printf("Socket created\n");
 
-    if (!crocket_socket_bind_to_any(&sock)) {
+    if (!crocket_socket_bind_any(&sock)) {
         fprintf(
             stderr,
             "Error: %s (error code %i)\n",

@@ -47,8 +47,12 @@
     #endif
 #endif
 
-#ifndef CROCKET_SOCKET_PLACEHOLDER_VALUE
-    #define CROCKET_SOCKET_PLACEHOLDER_VALUE (UINT16_MAX)
+#ifndef CROCKET_SOCKET_PORT_PLACEHOLDER_VALUE
+    #define CROCKET_SOCKET_PORT_PLACEHOLDER_VALUE (UINT16_MAX)
+#endif
+
+#ifndef CROCKET_SOCKET_EPHEMERAL_PORT
+    #define CROCKET_SOCKET_EPHEMERAL_PORT (0)
 #endif
 
 typedef struct _CROCKET_SOCKET {
@@ -65,8 +69,8 @@ static bool _crocket_is_winsock_initialized = false;
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
 
-CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock);
-CROCKET_API bool crocket_socket_bind_to_set(crocket_socket_t* sock, const uint16_t port);
+CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock);
+CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t port);
 
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock);
 
