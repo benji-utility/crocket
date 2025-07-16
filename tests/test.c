@@ -3,7 +3,7 @@
 #include "../src/crocket.h"
 
 int main(void) {
-    winsock_init();
+    crocket_winsock_init();
 
     crocket_socket_t sock;
 
@@ -40,5 +40,5 @@ int main(void) {
 
     printf("Socket closed\n");
 
-    winsock_cleanup();
+    crocket_winsock_cleanup();
 }

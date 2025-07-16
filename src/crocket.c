@@ -1,7 +1,7 @@
 #include "crocket.h"
 
 #ifdef CROCKET_WINDOWS
-    CROCKET_API bool winsock_init() {
+    CROCKET_API bool crocket_winsock_init() {
         struct WSAData wsa_data;
 
         if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_ERROR_NONE) {
@@ -18,7 +18,7 @@
         return true;
     }
 
-    CROCKET_API bool winsock_cleanup() {
+    CROCKET_API bool crocket_winsock_cleanup() {
         if (!_crocket_is_winsock_initialized) {
             _update_error_context(
                 CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
@@ -45,14 +45,7 @@
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
     #ifdef CROCKET_WINDOWS
-        if (!_crocket_is_winsock_initialized) {
-            _update_error_context(
-                CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                "Operation not permitted, Winsock not initialized"
-            );
-
-            return false;
-        }
+        _check_winsock();
     #endif
 
     sock->self = socket(AF_INET, SOCK_STREAM, 0);
@@ -82,14 +75,7 @@ CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock) {
 
 CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t port) {
     #if defined(CROCKET_WINDOWS)
-        if (!_crocket_is_winsock_initialized) {
-            _update_error_context(
-                CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                "Operation not permitted, Winsock not initialized"
-            );
-
-            return false;
-        }
+        _check_winsock();
     #endif
 
     struct sockaddr_in socket_address;
@@ -135,14 +121,7 @@ CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t p
 
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
     #ifdef CROCKET_WINDOWS
-        if (!_crocket_is_winsock_initialized) {
-            _update_error_context(
-                CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                "Operation not permitted, Winsock not initialized"
-            );
-
-            return false;
-        }
+        _check_winsock();
     #endif
 
     #if defined(CROCKET_WINDOWS)

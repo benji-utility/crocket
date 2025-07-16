@@ -28,6 +28,19 @@
     #ifndef CROCKET_INVALID_SOCKET
         #define CROCKET_INVALID_SOCKET INVALID_SOCKET
     #endif
+
+    #ifndef _check_winsock
+        #define _check_winsock() do { \
+            if (!_crocket_is_winsock_initialized) { \
+                _update_error_context( \
+                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED, \
+                    "Operation not permitted, Winsock not initialized" \
+                ); \
+                \
+                return false; \
+            } \
+        } while(false)
+    #endif
 #elif defined(CROCKET_LINUX)
     #include <errno.h>
 
@@ -63,8 +76,8 @@ typedef struct _CROCKET_SOCKET {
 static bool _crocket_is_winsock_initialized = false;
 
 #ifdef CROCKET_WINDOWS
-    CROCKET_API bool winsock_init();
-    CROCKET_API bool winsock_cleanup();
+    CROCKET_API bool crocket_winsock_init();
+    CROCKET_API bool crocket_winsock_cleanup();
 #endif
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
