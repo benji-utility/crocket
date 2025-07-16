@@ -1,23 +1,28 @@
-GCC := gcc
+GXX := gcc
 
-GCC_FLAGS := -g -I./src
+GXX_FLAGS := -g
 
 SRC := src
+TESTS := tests
 BUILD := build
-OBJ := $(BUILD)/obj
 
 SRCS := $(wildcard $(SRC)/*.c)
-OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
+TESTS_SRCS := $(wildcard $(TESTS)/*.c)
 
-STATIC_LIB := $(BUILD)/libcrocket.a
+OBJS := $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(SRCS))
 
-all: clean $(STATIC_LIB)
+TESTS_LINKED_LIBS := -lWs2_32
 
-$(STATIC_LIB): $(OBJS)
-	ar rcs $@ $^
+# STATIC_LIB := $(BUILD)/libcrocket.a
+
+# all: clean $(STATIC_LIB)
+all: clean
+
+# $(STATIC_LIB): $(OBJS)
+# 	ar rcs $@ $^
 
 $(OBJ)/%.o: $(SRC)/%.c
-	$(GCC) $(GCC_FLAGS) -c $< -o $@
+	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
 .SILENT: clean
@@ -36,8 +41,10 @@ endif
 mkbuild:
 ifeq ($(OS), Windows_NT)
 	if not exist "$(BUILD)" mkdir "$(BUILD)"
-	if not exist "$(OBJ)" mkdir "$(OBJ)"
 else
 	mkdir -p $(BUILD)
 	mkdir -p $(OBJ)
 endif
+
+test: clean
+	$(GXX) $(GXX_FLAGS) $(SRCS) $(TESTS_SRCS) -o $(BUILD)/tests $(TESTS_LINKED_LIBS)

@@ -41,7 +41,7 @@
     }
 #endif
 
-CROCKET_API bool crocket_socket_init(crocket_socket_t* _socket) {
+CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
     #ifdef CROCKET_WINDOWS
         if (!_crocket_is_winsock_initialized) {
             _update_error_context(
@@ -53,9 +53,9 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* _socket) {
         }
     #endif
 
-    *_socket = socket(AF_INET, SOCK_STREAM, 0);
+    sock->self = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (*_socket == CROCKET_INVALID_SOCKET) {
+    if (sock->self == CROCKET_INVALID_SOCKET) {
         #if defined(CROCKET_WINDOWS)
             _update_error_context(
                 WSAGetLastError(),

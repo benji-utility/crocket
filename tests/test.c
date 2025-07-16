@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "crocket.h"
+#include "../src/crocket.h"
 
 int main(void) {
     winsock_init();
@@ -16,7 +16,7 @@ int main(void) {
         );
     }
 
-    print("Socket created\n");
+    printf("Socket created with port %u\n", sock.port);
 
     winsock_cleanup();
 }

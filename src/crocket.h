@@ -1,6 +1,7 @@
 #ifndef __CROCKET_H
 #define __CROCKET_H
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "platform.h"
@@ -20,8 +21,6 @@
         #define CROCKET_API WINAPI
     #endif
 
-    typedef SOCKET CROCKET_SOCKET;
-
     #ifndef CROCKET_SOCKET_ERROR
         #define CROCKET_SOCKET_ERROR SOCKET_ERROR
     #endif
@@ -36,7 +35,7 @@
         #define CROCKET_API
     #endif
 
-    typedef unsigned long long CROCKET_SOCKET;
+    typedef unsigned long long SOCKET;
 
     #ifndef CROCKET_SOCKET_ERROR
         #define CROCKET_SOCKET_ERROR (-1)
@@ -47,7 +46,10 @@
     #endif
 #endif
 
-typedef CROCKET_SOCKET crocket_socket_t;
+typedef struct _CROCKET_SOCKET {
+    SOCKET self;
+    uint16_t port;
+} crocket_socket_t;
 
 static bool _crocket_is_winsock_initialized = false;
 
@@ -56,6 +58,6 @@ static bool _crocket_is_winsock_initialized = false;
     CROCKET_API bool winsock_cleanup();
 #endif
 
-CROCKET_API bool crocket_socket_init(crocket_socket_t* _socket);
+CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
 
 #endif
