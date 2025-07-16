@@ -35,6 +35,7 @@
         #define CROCKET_API
     #endif
 
+    // linux does not have a default socket type so we rollin' our own
     typedef unsigned long long SOCKET;
 
     #ifndef CROCKET_SOCKET_ERROR
@@ -44,6 +45,10 @@
     #ifndef CROCKET_INVALID_SOCKET
         #define CROCKET_INVALID_SOCKET (CROCKET_SOCKET)(~0)
     #endif
+#endif
+
+#ifndef CROCKET_SOCKET_PLACEHOLDER_VALUE
+    #define CROCKET_SOCKET_PLACEHOLDER_VALUE (UINT16_MAX)
 #endif
 
 typedef struct _CROCKET_SOCKET {
@@ -59,5 +64,7 @@ static bool _crocket_is_winsock_initialized = false;
 #endif
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
+
+CROCKET_API bool crocket_socket_close(crocket_socket_t* sock);
 
 #endif

@@ -1,4 +1,4 @@
 # crocket
 Cross-platform socket API
 
-moderately inspired by [cross-socket](https://github.com/NotMePipe/cross-socket)
+slightly inspired by [cross-socket](https://github.com/NotMePipe/cross-socket)
