@@ -98,9 +98,9 @@ CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t p
 
     socket_address.sin_family = AF_INET;
 
-    #if defined(_WIN32)
+    #if defined(CROCKET_WINDOWS)
         socket_address.sin_addr.S_un.S_addr = INADDR_ANY;
-    #elif defined(__linux__)
+    #elif defined(CROCKET_LINUX)
         address.sin_addr.s_addr = INADDR_ANY;
     #endif
 
