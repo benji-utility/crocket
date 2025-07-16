@@ -76,6 +76,54 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
     return true;
 }
 
+CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock) {
+    #if defined(CROCKET_WINDOWS)
+        if (!_crocket_is_winsock_initialized) {
+            _update_error_context(
+                CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
+                "Operation not permitted, Winsock not initialized"
+            );
+
+            return false;
+        }
+    #endif
+
+    struct sockaddr_in socket_address;
+
+    memset(&socket_address, 0, sizeof(socket_address));
+
+    socket_address.sin_family = AF_INET;
+
+    #if defined(_WIN32)
+        socket_address.sin_addr.S_un.S_addr = INADDR_ANY;
+    #elif defined(__linux__)
+        address.sin_addr.s_addr = INADDR_ANY;
+    #endif
+
+    if (bind(sock->self, (struct sockaddr*) &socket_address, sizeof(socket_address)) == SOCKET_ERROR) {
+        #if defined(CROCKET_WINDOWS)
+            _update_error_context(
+                WSAGetLastError(),
+                "Failed to bind socket to arbitrary port"
+            );
+        #elif defined(CROCKET_LINUX)
+            _update_error_context(errno, strerror(errno));
+        #endif
+
+        return false;
+    }
+
+    socklen_t socket_address_length = sizeof(socket_address);
+
+    getsockname(sock->self, (struct sockaddr*) &socket_address, &socket_address_length);
+
+    sock->port = ntohs(socket_address.sin_port);
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_bind_to_set(crocket_socket_t* sock, const uint16_t port);
+
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
     #ifdef CROCKET_WINDOWS
         if (!_crocket_is_winsock_initialized) {

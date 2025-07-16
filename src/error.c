@@ -1,6 +1,6 @@
 #include "error.h"
 
-void _update_error_context(int error_code, const char* error_message) {
+void _update_error_context(const int error_code, const char* error_message) {
     _error_context.error_code = error_code;
     _error_context.error_message = error_message;
 }

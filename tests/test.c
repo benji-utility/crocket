@@ -16,7 +16,18 @@ int main(void) {
         );
     }
 
-    printf("Socket created\n", sock.port);
+    printf("Socket created\n");
+
+    if (!crocket_socket_bind_to_any(&sock)) {
+        fprintf(
+            stderr,
+            "Error: %s (error code %i)\n",
+            crocket_get_last_error_message(),
+            crocket_get_last_error_code()
+        );
+    }
+
+    printf("Socket binded to port %u\n", sock.port);
 
     if (!crocket_socket_close(&sock)) {
         fprintf(

@@ -65,6 +65,9 @@ static bool _crocket_is_winsock_initialized = false;
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
 
+CROCKET_API bool crocket_socket_bind_to_any(crocket_socket_t* sock);
+CROCKET_API bool crocket_socket_bind_to_set(crocket_socket_t* sock, const uint16_t port);
+
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock);
 
 #endif

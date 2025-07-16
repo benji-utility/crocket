@@ -14,7 +14,7 @@ static struct _CROCKET_ERROR_CONTEXT {
     const char* error_message;
 } _error_context;
 
-void _update_error_context(int error_code, const char* error_message);
+void _update_error_context(const int error_code, const char* error_message);
 
 int crocket_get_last_error_code();
 const char* crocket_get_last_error_message();
