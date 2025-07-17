@@ -1,61 +1,24 @@
-#include "crocket.h"
-
-#ifdef CROCKET_WINDOWS
-    CROCKET_API bool crocket_winsock_init() {
-        struct WSAData wsa_data;
-
-        if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_ERROR_NONE) {
-            _crocket_update_error_context(
-                WSAGetLastError(),
-                "WSAStartup() failed"
-            );
-
-            return false;
-        }
-
-        _crocket_is_winsock_initialized = true;
-
-        return true;
-    }
-
-    CROCKET_API bool crocket_winsock_cleanup() {
-        if (!_crocket_is_winsock_initialized) {
-            _crocket_update_error_context(
-                CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                "Winsock not initialized"
-            );
-
-            return false;
-        }
-
-        if (WSACleanup() != CROCKET_ERROR_NONE) {
-            _crocket_update_error_context(
-                WSAGetLastError(),
-                "WSACleanup() failed"
-            );
-
-            return false;
-        }
-
-        _crocket_is_winsock_initialized = false;
-
-        return true;
-    }
-#endif
+#include "socket.h"
 
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
-    #ifdef CROCKET_WINDOWS
-        _check_winsock();
-    #endif
-
     sock->self = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sock->self == CROCKET_INVALID_SOCKET) {
         #if defined(CROCKET_WINDOWS)
-            _crocket_update_error_context(
-                WSAGetLastError(),
-                "Failed to create socket"
-            );
+            int error_code = WSAGetLastError();
+
+            if (error_code == WSANOTINITIALISED) {
+                _crocket_update_error_context(
+                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
+                    "Operation not permitted, Winsock not initialized"
+                );
+            }
+            else {
+                _crocket_update_error_context(
+                    error_code,
+                    "Failed to create socket"
+                );
+            }
         #elif defined(CROCKET_LINUX)
             _crocket_update_error_context(errno, strerror(errno));
         #endif
@@ -70,14 +33,10 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock) {
-    crocket_socket_bind_to(sock, NULL, CROCKET_SOCKET_EPHEMERAL_PORT);
+    return crocket_socket_bind_to(sock, NULL, CROCKET_SOCKET_EPHEMERAL_PORT);
 }
 
 CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* address, const uint16_t port) {
-    #if defined(CROCKET_WINDOWS)
-        _check_winsock();
-    #endif
-
     struct sockaddr_in socket_address;
 
     memset(&socket_address, 0, sizeof(socket_address));
@@ -89,10 +48,20 @@ CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* addr
 
     if (bind(sock->self, (struct sockaddr*) &socket_address, sizeof(socket_address)) == SOCKET_ERROR) {
         #if defined(CROCKET_WINDOWS)
-            _crocket_update_error_context(
-                WSAGetLastError(),
-                "Failed to bind socket to arbitrary port"
-            );
+            int error_code = WSAGetLastError();
+
+            if (error_code == WSANOTINITIALISED) {
+                _crocket_update_error_context(
+                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
+                    "Operation not permitted, Winsock not initialized"
+                );
+            }
+            else {
+                _crocket_update_error_context(
+                    error_code,
+                    "Failed to bind socket to arbitrary port"
+                );
+            }
         #elif defined(CROCKET_LINUX)
             _crocket_update_error_context(errno, strerror(errno));
         #endif
@@ -115,10 +84,6 @@ CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* addr
 }
 
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
-    #ifdef CROCKET_WINDOWS
-        _check_winsock();
-    #endif
-
     #if defined(CROCKET_WINDOWS)
         int return_code = closesocket(sock->self);
     #elif defined(CROCKET_LINUX)
@@ -127,10 +92,20 @@ CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
 
     if (return_code == SOCKET_ERROR) {
         #if defined(CROCKET_WINDOWS)
-            _crocket_update_error_context(
-                WSAGetLastError(),
-                "Failed to close socket"
-            );
+            int error_code = WSAGetLastError();
+
+            if (error_code == WSANOTINITIALISED) {
+                _crocket_update_error_context(
+                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
+                    "Operation not permitted, Winsock not initialized"
+                );
+            }
+            else {
+                _crocket_update_error_context(
+                    error_code,
+                    "Failed to create socket"
+                );
+            }
         #elif defined(CROCKET_LINUX)
             _crocket_update_error_context(errno, strerror(errno));
         #endif

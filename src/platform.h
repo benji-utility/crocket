@@ -1,7 +1,3 @@
-#ifndef __CROCKET_H
-    #error "Do not include this file directly, instead use <crocket.h>"
-#endif
-
 #ifndef __CROCKET_PLATFORM_H
     #if defined(_WIN32) || defined(_WIN64)
         #ifndef CROCKET_WINDOWS
