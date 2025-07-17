@@ -32,7 +32,7 @@
     #ifndef _check_winsock
         #define _check_winsock() do { \
             if (!_crocket_is_winsock_initialized) { \
-                _update_error_context( \
+                _crocket_update_error_context( \
                     CROCKET_ERROR_WINSOCK_NOT_INITIALIZED, \
                     "Operation not permitted, Winsock not initialized" \
                 ); \
@@ -40,6 +40,10 @@
                 return false; \
             } \
         } while(false)
+    #endif
+
+    #ifndef _CROCKET_SOCKADDR_IN_ADDRESS
+        #define _CROCKET_SOCKADDR_IN_ADDRESS(_sockaddr_in) (_sockaddr_in.sin_addr.S_un.S_addr)
     #endif
 #elif defined(CROCKET_LINUX)
     #include <errno.h>
@@ -57,6 +61,10 @@
 
     #ifndef CROCKET_INVALID_SOCKET
         #define CROCKET_INVALID_SOCKET (CROCKET_SOCKET)(~0)
+    #endif
+
+    #ifndef _CROCKET_SOCKADDR_IN_ADDRESS
+        #define _CROCKET_SOCKADDR_IN_ADDRESS(_sockaddr_in) (_sockaddr_in.sin_addr.s_addr)
     #endif
 #endif
 
@@ -83,7 +91,7 @@ static bool _crocket_is_winsock_initialized = false;
 CROCKET_API bool crocket_socket_init(crocket_socket_t* sock);
 
 CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock);
-CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t port);
+CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* address, const uint16_t port);
 
 CROCKET_API bool crocket_socket_close(crocket_socket_t* sock);
 

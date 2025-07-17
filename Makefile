@@ -1,6 +1,6 @@
 GXX := gcc
 
-GXX_FLAGS := -g
+GXX_FLAGS := -g -Wno-discarded-qualifiers
 
 SRC := src
 TESTS := tests

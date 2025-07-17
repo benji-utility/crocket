@@ -14,6 +14,8 @@ int main(void) {
             crocket_get_last_error_message(),
             crocket_get_last_error_code()
         );
+
+        return EXIT_FAILURE;
     }
 
     printf("Socket created\n");
@@ -25,6 +27,8 @@ int main(void) {
             crocket_get_last_error_message(),
             crocket_get_last_error_code()
         );
+
+        return EXIT_FAILURE;
     }
 
     printf("Socket binded to port %u\n", sock.port);
@@ -36,9 +40,13 @@ int main(void) {
             crocket_get_last_error_message(),
             crocket_get_last_error_code()
         );
+
+        return EXIT_FAILURE;
     }
 
     printf("Socket closed\n");
 
     crocket_winsock_cleanup();
+
+    return EXIT_SUCCESS;
 }

@@ -5,7 +5,7 @@
         struct WSAData wsa_data;
 
         if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_ERROR_NONE) {
-            _update_error_context(
+            _crocket_update_error_context(
                 WSAGetLastError(),
                 "WSAStartup() failed"
             );
@@ -20,7 +20,7 @@
 
     CROCKET_API bool crocket_winsock_cleanup() {
         if (!_crocket_is_winsock_initialized) {
-            _update_error_context(
+            _crocket_update_error_context(
                 CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
                 "Winsock not initialized"
             );
@@ -29,7 +29,7 @@
         }
 
         if (WSACleanup() != CROCKET_ERROR_NONE) {
-            _update_error_context(
+            _crocket_update_error_context(
                 WSAGetLastError(),
                 "WSACleanup() failed"
             );
@@ -52,12 +52,12 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
 
     if (sock->self == CROCKET_INVALID_SOCKET) {
         #if defined(CROCKET_WINDOWS)
-            _update_error_context(
+            _crocket_update_error_context(
                 WSAGetLastError(),
                 "Failed to create socket"
             );
         #elif defined(CROCKET_LINUX)
-            _update_error_context(errno, strerror(errno));
+            _crocket_update_error_context(errno, strerror(errno));
         #endif
 
         return false;
@@ -70,10 +70,10 @@ CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock) {
-    crocket_socket_bind_to(sock, CROCKET_SOCKET_EPHEMERAL_PORT);
+    crocket_socket_bind_to(sock, NULL, CROCKET_SOCKET_EPHEMERAL_PORT);
 }
 
-CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t port) {
+CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* address, const uint16_t port) {
     #if defined(CROCKET_WINDOWS)
         _check_winsock();
     #endif
@@ -83,23 +83,18 @@ CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const uint16_t p
     memset(&socket_address, 0, sizeof(socket_address));
 
     socket_address.sin_family = AF_INET;
-
-    #if defined(CROCKET_WINDOWS)
-        socket_address.sin_addr.S_un.S_addr = INADDR_ANY;
-    #elif defined(CROCKET_LINUX)
-        address.sin_addr.s_addr = INADDR_ANY;
-    #endif
-
     socket_address.sin_port = htons(port);
+
+    _CROCKET_SOCKADDR_IN_ADDRESS(socket_address) = address ? inet_addr(address) : INADDR_ANY;
 
     if (bind(sock->self, (struct sockaddr*) &socket_address, sizeof(socket_address)) == SOCKET_ERROR) {
         #if defined(CROCKET_WINDOWS)
-            _update_error_context(
+            _crocket_update_error_context(
                 WSAGetLastError(),
                 "Failed to bind socket to arbitrary port"
             );
         #elif defined(CROCKET_LINUX)
-            _update_error_context(errno, strerror(errno));
+            _crocket_update_error_context(errno, strerror(errno));
         #endif
 
         return false;
@@ -132,12 +127,12 @@ CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
 
     if (return_code == SOCKET_ERROR) {
         #if defined(CROCKET_WINDOWS)
-            _update_error_context(
+            _crocket_update_error_context(
                 WSAGetLastError(),
                 "Failed to close socket"
             );
         #elif defined(CROCKET_LINUX)
-            _update_error_context(errno, strerror(errno));
+            _crocket_update_error_context(errno, strerror(errno));
         #endif
 
         return false;
