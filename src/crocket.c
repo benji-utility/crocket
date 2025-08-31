@@ -1,0 +1,25 @@
+#include "crocket.h"
+
+#if defined(CROCKET_WINDOWS)
+    CROCKET_API bool winsock_init() {
+        struct WSAData wsa_data;
+
+        if (!WSAStartup(WINSOCK_VERSION, &wsa_data)) {
+            // todo: error handling
+
+            return false;
+        }
+
+        return true;
+    }
+
+    CROCKET_API bool winsock_cleanup() {
+        if (!WSACleanup()) {
+            // todo: error handling
+
+            return false;
+        }
+
+        return false;
+    }
+#endif
