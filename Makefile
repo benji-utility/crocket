@@ -7,7 +7,7 @@ BUILD := build
 OBJ := $(BUILD)/obj
 
 SRCS := $(wildcard $(SRC)/*.c)
-OBJS := $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(SRCS))
+OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 
 all: clean
 
