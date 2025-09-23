@@ -7,6 +7,8 @@
 #include "platform.h"
 
 #if defined(CROCKET_WINDOWS)
+    #pragma comment(lib, "ws2_32.lib")
+
     #ifndef WIN32_LEAN_AND_MEAN
         #define WIN32_LEAN_AND_MEAN
     #endif
@@ -18,6 +20,10 @@
     #endif
 
     typedef SOCKET socket_t;
+#elif defined(CROCKET_LINUX)
+    #ifndef CROCKET_API
+        #define CROCKET_API
+    #endif
 #endif
 
 #endif

@@ -4,6 +4,7 @@ GXX_FLAGS := -g -Wno-discarded-qualifiers
 
 SRC := src
 BUILD := build
+OBJ := $(BUILD)/obj
 
 SRCS := $(wildcard $(SRC)/*.c)
 OBJS := $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(SRCS))
