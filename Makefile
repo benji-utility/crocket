@@ -9,29 +9,43 @@ OBJ := $(BUILD)/obj
 SRCS := $(wildcard $(SRC)/*.c)
 OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 
-all: clean
+TEST_DIR := tests
+TEST_OBJ := $(OBJ)/$(TEST_DIR)
+
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.c)
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(TEST_OBJ)/%.o, $(TEST_SRCS))
+
+LIB := $(BUILD)/libcrocket.a
+TEST := $(BUILD)/test_crocket
+
+.PHONY: all clean mkbuild
+
+all: mkbuild $(LIB) $(TEST)
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
-ifeq ($(OS), Windows_NT)
-.SILENT: clean
-endif
+$(TEST_OBJ)/%.o: $(TEST_DIR)/%.c
+	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
-.PHONY: clean mkbuild
+$(LIB): $(OBJS)
+	ar rcs $@ $(OBJS)
+
+$(TEST): $(TEST_OBJS) $(LIB)
+	$(GXX) $(GXX_FLAGS) -o $@ $(TEST_OBJS) -L$(BUILD) -lcrocket
+
+mkbuild:
+ifeq ($(OS), Windows_NT)
+	if not exist "$(BUILD)" mkdir "$(BUILD)"
+	if not exist "$(OBJ)" mkdir "$(OBJ)"
+	if not exist "$(TEST_OBJ)" mkdir "$(TEST_OBJ)"
+else
+	mkdir -p $(BUILD) $(OBJ) $(TEST_OBJ)
+endif
 
 clean: mkbuild
 ifeq ($(OS), Windows_NT)
 	del /Q /S $(BUILD)\*
 else
-	find $(BUILD) -maxdepth 1 -type f -exec rm {} \;
-	rm -rf $(OBJ)/*
-endif
-
-mkbuild:
-ifeq ($(OS), Windows_NT)
-	if not exist "$(BUILD)" mkdir "$(BUILD)"
-else
-	mkdir -p $(BUILD)
-	mkdir -p $(OBJ)
+	rm -rf $(BUILD)/*
 endif
