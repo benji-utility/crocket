@@ -40,4 +40,8 @@
     #define CROCKET_SUCCESS (0)
 #endif
 
+#ifndef CROCKET_NO_FLAGS
+    #define CROCKET_NO_FLAGS (0)
+#endif
+
 #endif

@@ -61,8 +61,11 @@ CROCKET_API bool crocket_socket_set_address_any(socket_t* sock, int address_fami
 CROCKET_API bool crocket_socket_bind(socket_t* sock); // bind to its internal address
 CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog);
 CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client_socket);
+CROCKET_API bool crocket_socket_connect(socket_t* sock); // connect to internal address
 
-bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size);
-unsigned short crocket_socket_get_port(const socket_t sock);
+CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_length, int flags);
+
+CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size);
+CROCKET_API unsigned short crocket_socket_get_port(const socket_t sock);
 
 #endif

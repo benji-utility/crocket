@@ -137,7 +137,47 @@ CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client
     return true;
 }
 
-bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size) {
+CROCKET_API bool crocket_socket_connect(socket_t* sock) {
+    // todo: check if WSAStartup has been called
+    
+    if (!sock) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (connect(sock->handle, (struct sockaddr*) &sock->address, sizeof(sock->address)) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_length, int flags) {
+    // todo: check if WSAStartup has been called
+    
+    if (!sock || !data || data_length == 0) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    size_t bytes_sent = send(sock->handle, data, data_length, flags);
+
+    if (bytes_sent != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size) {
+    // todo: check if WSAStartup has been called
+
     if (!buffer || buffer_size == 0) {
         // todo: collect error info
 
@@ -163,7 +203,9 @@ bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer
     return true;
 }
 
-unsigned short crocket_socket_get_port(const socket_t sock) {
+CROCKET_API unsigned short crocket_socket_get_port(const socket_t sock) {
+    // todo: check if WSAStartup has been called
+
     struct sockaddr_in address;
 
     socklen_t address_length = sizeof(address);
