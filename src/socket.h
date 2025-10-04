@@ -37,5 +37,6 @@ CROCKET_API bool crocket_socket_set_address(socket_t* sock, int address_family, 
 
 CROCKET_API bool crocket_socket_bind(socket_t* sock); // bind to its internal address
 CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog);
+CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client_socket);
 
 #endif

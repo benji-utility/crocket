@@ -76,6 +76,8 @@ CROCKET_API bool crocket_socket_bind(socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
+    // todo: check if WSAStartup has been called
+
     if (!sock) {
         // todo: collect error info
 
@@ -93,6 +95,37 @@ CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
 
         return false;
     }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client_socket) {
+    // todo: check if WSAStartup has been called
+    
+    if (!server_socket || !client_socket) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    struct sockaddr_in client_address;
+    socklen_t address_length = sizeof(client_address);
+
+    socket_handle_t client_handle = accept(
+        server_socket->handle,
+        (struct sockaddr*) &client_address,
+        &address_length
+    );
+
+    if (client_handle == CROCKET_INVALID_SOCKET) {
+        // todo: collect error info
+        
+        return false;
+    }
+
+    client_socket->handle = client_handle;
+    client_socket->address = client_address;
+
 
     return true;
 }

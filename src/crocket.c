@@ -5,7 +5,7 @@
         struct WSAData wsa_data;
 
         if (!WSAStartup(WINSOCK_VERSION, &wsa_data)) {
-            // todo: error handling
+            // todo: collect error info
 
             return false;
         }
@@ -15,7 +15,7 @@
 
     CROCKET_API bool winsock_cleanup() {
         if (!WSACleanup()) {
-            // todo: error handling
+            // todo: collect error info
 
             return false;
         }
