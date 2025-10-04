@@ -16,7 +16,7 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    if (!crocket_socket_set_address(&server_socket, AF_INET, "127.0.0.1", 8080)) {
+    if (!crocket_socket_set_address_any(&server_socket, AF_INET)) {
         printf("Unable to assign address to server socket\n");
         
         return EXIT_FAILURE;
@@ -34,7 +34,11 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    printf("Server socket listening on 127.0.0.1:8080 ...\n");
+    char ip[CROCKET_IP_STRING_LENGTH];
+
+    crocket_socket_get_ip(server_socket, AF_INET, ip, sizeof(ip));
+
+    printf("Server socket listening on %s:%u ...\n", ip, crocket_socket_get_port(server_socket));
 
     socket_t client_socket;
 
