@@ -1,4 +1,5 @@
 #ifndef __CROCKET_PLATFORM_H
+#define __CROCKET_PLATFORM_H
 
 #ifdef _WIN32
     #ifndef CROCKET_WINDOWS
