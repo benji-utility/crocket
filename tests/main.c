@@ -16,7 +16,7 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    if (!crocket_socket_set_address_any(&server_socket, AF_INET)) {
+    if (!crocket_socket_set_address(&server_socket, AF_INET, "127.0.0.1", CROCKET_PORT_ANY)) {
         printf("Unable to assign address to server socket\n");
         
         return EXIT_FAILURE;
