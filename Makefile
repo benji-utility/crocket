@@ -15,6 +15,12 @@ TEST_SRCS := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(TEST_OBJ)/%.o, $(TEST_SRCS))
 TEST_BIN := $(patsubst $(TEST_DIR)/%.c, $(BUILD)/%, $(TEST_SRCS))
 
+ifeq ($(OS), Windows_NT)
+	LINKED_LIBS := -lws2_32
+else
+	LINKED_LIBS :=
+endif
+
 LIB := $(BUILD)/libcrocket.a
 
 .PHONY: all clean mkbuild
@@ -31,7 +37,7 @@ $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
 $(BUILD)/%: $(TEST_OBJ)/%.o $(LIB)
-	$(GXX) $(GXX_FLAGS) -o $@ $< -L$(BUILD) -lcrocket
+	$(GXX) $(GXX_FLAGS) -o $@ $< -L$(BUILD) -lcrocket $(LINKED_LIBS)
 
 mkbuild:
 ifeq ($(OS), Windows_NT)

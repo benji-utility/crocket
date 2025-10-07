@@ -16,6 +16,8 @@
     #endif
 
     #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #include <windows.h>
 
     #ifndef CROCKET_API
         #define CROCKET_API WSAAPI
