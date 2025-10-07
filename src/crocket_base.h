@@ -1,6 +1,7 @@
 #ifndef __CROCKET_BASE_H
 #define __CROCKET_BASE_H
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>

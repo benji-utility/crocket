@@ -35,8 +35,16 @@
     #endif
 #endif
 
+#ifndef _CROCKET_RECV_CHUNK_SIZE
+    #define _CROCKET_RECV_CHUNK_SIZE (512)
+#endif
+
 #ifndef CROCKET_IP_STRING_LENGTH
     #define CROCKET_IP_STRING_LENGTH INET_ADDRSTRLEN
+#endif
+
+#ifndef CROCKET_SOCKET_PROTOCOL_ANY
+    #define CROCKET_SOCKET_PROTOCOL_ANY (0)
 #endif
 
 #ifndef CROCKET_IP_ANY
@@ -64,8 +72,9 @@ CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client
 CROCKET_API bool crocket_socket_connect(socket_t* sock); // connect to internal address
 
 CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_length, int flags);
+CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size_t* buffer_capacity, size_t* bytes_received, int flags);
 
 CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size);
-CROCKET_API unsigned short crocket_socket_get_port(const socket_t sock);
+CROCKET_API bool crocket_socket_get_port(const socket_t sock, unsigned short* port);
 
 #endif

@@ -11,16 +11,15 @@ OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 
 TEST_DIR := tests
 TEST_OBJ := $(OBJ)/$(TEST_DIR)
-
 TEST_SRCS := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(TEST_OBJ)/%.o, $(TEST_SRCS))
+TEST_BIN := $(patsubst $(TEST_DIR)/%.c, $(BUILD)/%, $(TEST_SRCS))
 
 LIB := $(BUILD)/libcrocket.a
-TEST := $(BUILD)/test_crocket
 
 .PHONY: all clean mkbuild
 
-all: mkbuild $(LIB) $(TEST)
+all: mkbuild $(LIB) $(TEST_BIN)
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
@@ -31,8 +30,8 @@ $(TEST_OBJ)/%.o: $(TEST_DIR)/%.c
 $(LIB): $(OBJS)
 	ar rcs $@ $(OBJS)
 
-$(TEST): $(TEST_OBJS) $(LIB)
-	$(GXX) $(GXX_FLAGS) -o $@ $(TEST_OBJS) -L$(BUILD) -lcrocket
+$(BUILD)/%: $(TEST_OBJ)/%.o $(LIB)
+	$(GXX) $(GXX_FLAGS) -o $@ $< -L$(BUILD) -lcrocket
 
 mkbuild:
 ifeq ($(OS), Windows_NT)

@@ -166,10 +166,62 @@ CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_len
 
     size_t bytes_sent = send(sock->handle, data, data_length, flags);
 
-    if (bytes_sent != CROCKET_SUCCESS) {
+    if (bytes_sent == -1) {
         // todo: collect error info
 
         return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size_t* buffer_capacity, size_t* bytes_received, int flags) {
+    if (!sock || *buffer_capacity == 0) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    *bytes_received = 0;
+
+    while (true) {
+        char chunk[_CROCKET_RECV_CHUNK_SIZE];
+
+        ssize_t received = recv(sock->handle, chunk, sizeof(chunk), flags);
+
+        if (received < 0) {
+            // todo: collect error info
+
+            return false;
+        }
+
+        if (received == 0) break; // connection closed
+        
+        if (*bytes_received + received > *buffer_capacity) {
+            size_t new_size = *buffer_capacity * 2;
+
+            while (*bytes_received + received > new_size) {
+                new_size *= 2;
+            }
+
+            char* new_buffer = realloc(*data_buffer, new_size);
+
+            if (!new_buffer) {
+                // todo: collect error info
+
+                return false;
+            }
+
+            *data_buffer = new_buffer;
+
+            *buffer_capacity = new_size;
+        }
+
+        memcpy(*data_buffer + *bytes_received, chunk, received);
+
+        *bytes_received += received;
+
+        if ((size_t) received < sizeof(chunk)) break;
     }
 
     return true;
@@ -203,7 +255,7 @@ CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, 
     return true;
 }
 
-CROCKET_API unsigned short crocket_socket_get_port(const socket_t sock) {
+CROCKET_API bool crocket_socket_get_port(const socket_t sock, unsigned short* port) {
     // todo: check if WSAStartup has been called
 
     struct sockaddr_in address;
@@ -216,5 +268,7 @@ CROCKET_API unsigned short crocket_socket_get_port(const socket_t sock) {
         return false;
     }
 
-    return ntohs(address.sin_port);
+    *port = ntohs(address.sin_port);
+
+    return true;
 }
