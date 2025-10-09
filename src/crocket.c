@@ -1,7 +1,11 @@
 #include "crocket.h"
 
 #if defined(CROCKET_WINDOWS)
+    static bool _crocket_is_winsock_initialized = false;
+
     CROCKET_API bool winsock_init() {
+        if (_crocket_is_winsock_initialized) return true;
+
         struct WSAData wsa_data;
 
         if (!WSAStartup(WINSOCK_VERSION, &wsa_data)) {
@@ -9,6 +13,8 @@
 
             return false;
         }
+
+        _crocket_is_winsock_initialized = true;
 
         return true;
     }

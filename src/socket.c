@@ -1,7 +1,13 @@
 #include "socket.h"
 
 CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int type, int protocol) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
     
     sock->handle = socket(address_family, type, protocol);
 
@@ -15,7 +21,13 @@ CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int typ
 }
 
 CROCKET_API bool crocket_socket_close(socket_t* sock) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     if (!sock) {
         return false;
@@ -37,7 +49,13 @@ CROCKET_API bool crocket_socket_close(socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_set_address(socket_t* sock, int address_family, const char* ip, unsigned short port) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     if (!sock) {
         return false;
@@ -65,7 +83,13 @@ CROCKET_API bool crocket_socket_set_address_any(socket_t* sock, int address_fami
 }
 
 CROCKET_API bool crocket_socket_bind(socket_t* sock) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     if (!sock) {
         // todo: collect error info
@@ -83,7 +107,13 @@ CROCKET_API bool crocket_socket_bind(socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     if (!sock) {
         // todo: collect error info
@@ -107,8 +137,14 @@ CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
 }
 
 CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client_socket) {
-    // todo: check if WSAStartup has been called
-    
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
     if (!server_socket || !client_socket) {
         // todo: collect error info
 
@@ -138,8 +174,14 @@ CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client
 }
 
 CROCKET_API bool crocket_socket_connect(socket_t* sock) {
-    // todo: check if WSAStartup has been called
-    
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
     if (!sock) {
         // todo: collect error info
 
@@ -156,8 +198,14 @@ CROCKET_API bool crocket_socket_connect(socket_t* sock) {
 }
 
 CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_length, int flags) {
-    // todo: check if WSAStartup has been called
-    
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
     if (!sock || !data || data_length == 0) {
         // todo: collect error info
 
@@ -176,6 +224,14 @@ CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_len
 }
 
 CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size_t* buffer_capacity, size_t* bytes_received, int flags) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
     if (!sock || *buffer_capacity == 0) {
         // todo: collect error info
 
@@ -228,7 +284,13 @@ CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size
 }
 
 CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     if (!buffer || buffer_size == 0) {
         // todo: collect error info
@@ -256,7 +318,13 @@ CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, 
 }
 
 CROCKET_API bool crocket_socket_get_port(const socket_t sock, unsigned short* port) {
-    // todo: check if WSAStartup has been called
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
 
     struct sockaddr_in address;
 
