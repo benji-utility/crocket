@@ -41,9 +41,9 @@ $(BUILD)/%: $(TEST_OBJ)/%.o $(LIB)
 
 mkbuild:
 ifeq ($(OS), Windows_NT)
-	if not exist "$(BUILD)" mkdir "$(BUILD)"
-	if not exist "$(OBJ)" mkdir "$(OBJ)"
-	if not exist "$(TEST_OBJ)" mkdir "$(TEST_OBJ)"
+	cmd /C "if not exist '$(BUILD)' mkdir '$(BUILD)'"
+	cmd /C "if not exist '$(OBJ)' mkdir '$(OBJ)'"
+	cmd /C "if not exist '$(TEST_OBJ)' mkdir '$(TEST_OBJ)'"
 else
 	mkdir -p $(BUILD) $(OBJ) $(TEST_OBJ)
 endif
