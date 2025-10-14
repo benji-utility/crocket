@@ -1,7 +1,5 @@
 #include "socket.h"
 
-#include <stdio.h>
-
 CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int type, int protocol) {
     #ifdef CROCKET_WINDOWS
         if (!winsock_init()) {
