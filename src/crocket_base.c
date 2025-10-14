@@ -20,7 +20,13 @@
     }
 
     CROCKET_API bool winsock_cleanup() {
-        if (!WSACleanup()) {
+        if (!_crocket_is_winsock_initialized) {
+            // todo: collect error info
+
+            return false;
+        }
+
+        if (WSACleanup() != CROCKET_SUCCESS) {
             // todo: collect error info
 
             return false;
