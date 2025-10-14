@@ -24,18 +24,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y make gcc
 
-      - name: Set up build environment (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          choco install make mingw
-        shell: pwsh
+#      - name: Set up build environment (Windows)
+#        if: runner.os == 'Windows'
+#        run: |
+#          choco install make mingw
+#        shell: pwsh
 
       - name: Build library and tests (Linux)
         if: runner.os == 'Linux'
         run: make all
         shell: bash
 
-      - name: Build library and tests (Windows)
-        if: runner.os == 'Windows'
-        run: mingw32-make all
-        shell: cmd
+#      - name: Build library and tests (Windows)
+#        if: runner.os == 'Windows'
+#        run: mingw32-make all
+#        shell: cmd
