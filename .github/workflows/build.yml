@@ -28,7 +28,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           choco install make mingw
-        shell: pwsh
+        shell: cmd
 
       - name: Build library and tests (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -38,4 +38,4 @@ jobs:
       - name: Build library and tests (Windows)
         if: matrix.os == 'windows-latest'
         run: make all
-        shell: pwsh
+        shell: cmd
