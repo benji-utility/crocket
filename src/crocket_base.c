@@ -1,4 +1,4 @@
-#include "crocket.h"
+#include "crocket_base.h"
 
 #if defined(CROCKET_WINDOWS)
     static bool _crocket_is_winsock_initialized = false;
@@ -8,7 +8,7 @@
 
         struct WSAData wsa_data;
 
-        if (!WSAStartup(WINSOCK_VERSION, &wsa_data)) {
+        if (WSAStartup(WINSOCK_VERSION, &wsa_data) != CROCKET_SUCCESS) {
             // todo: collect error info
 
             return false;
@@ -26,6 +26,6 @@
             return false;
         }
 
-        return false;
+        return true;
     }
 #endif

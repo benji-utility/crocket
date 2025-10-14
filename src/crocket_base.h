@@ -47,4 +47,17 @@
     #define CROCKET_NO_FLAGS (0)
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(CROCKET_WINDOWS)
+    CROCKET_API bool winsock_init();
+    CROCKET_API bool winsock_cleanup();
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

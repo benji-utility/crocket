@@ -52,7 +52,7 @@ int main(void) {
 
     char ip[CROCKET_IP_STRING_LENGTH];
     unsigned short port;
-    
+
     if (!crocket_socket_get_ip(server_socket, AF_INET, ip, sizeof(ip))) {
         printf("Failed to get server socket IP\n");
 
@@ -97,7 +97,7 @@ int main(void) {
 
     size_t capacity = 1024;
     char* data = malloc(capacity);
-    
+
     size_t bytes_received;
 
     if (crocket_socket_receive(&client_socket, &data, &capacity, &bytes_received, CROCKET_NO_FLAGS)) {
@@ -126,7 +126,7 @@ int main(void) {
 
     crocket_socket_close(&client_socket);
     crocket_socket_close(&server_socket);
-    
+
     #ifdef CROCKET_WINDOWS
         winsock_cleanup();
     #endif

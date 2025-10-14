@@ -16,7 +16,7 @@ TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(TEST_OBJ)/%.o, $(TEST_SRCS))
 TEST_BIN := $(patsubst $(TEST_DIR)/%.c, $(BUILD)/%, $(TEST_SRCS))
 
 ifeq ($(OS), Windows_NT)
-	LINKED_LIBS := -lws2_32
+	LINKED_LIBS := -lWs2_32
 else
 	LINKED_LIBS :=
 endif

@@ -1,5 +1,7 @@
 #include "socket.h"
 
+#include <stdio.h>
+
 CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int type, int protocol) {
     #ifdef CROCKET_WINDOWS
         if (!winsock_init()) {
@@ -8,7 +10,7 @@ CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int typ
             return false;
         }
     #endif
-    
+
     sock->handle = socket(address_family, type, protocol);
 
     if (sock->handle == CROCKET_INVALID_SOCKET) {
@@ -93,13 +95,13 @@ CROCKET_API bool crocket_socket_bind(socket_t* sock) {
 
     if (!sock) {
         // todo: collect error info
-        
+
         return false;
     }
 
     if (bind(sock->handle, (struct sockaddr*) &sock->address, sizeof(sock->address)) != CROCKET_SUCCESS) {
         // todo: collect error info
-    
+
         return false;
     }
 
@@ -123,7 +125,7 @@ CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
 
     if (backlog > SOMAXCONN) {
         // todo: collect error info
-        
+
         return false;
     }
 
@@ -163,7 +165,7 @@ CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client
 
     if (client_handle == CROCKET_INVALID_SOCKET) {
         // todo: collect error info
-        
+
         return false;
     }
 
@@ -252,7 +254,7 @@ CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size
         }
 
         if (received == 0) break; // connection closed
-        
+
         if (*bytes_received + received > *buffer_capacity) {
             size_t new_size = *buffer_capacity * 2;
 

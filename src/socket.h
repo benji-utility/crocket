@@ -60,6 +60,10 @@ typedef struct _CROCKET_SOCKET {
     struct sockaddr_in address;
 } socket_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int type, int protocol);
 CROCKET_API bool crocket_socket_close(socket_t* sock);
 
@@ -76,5 +80,9 @@ CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size
 
 CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size);
 CROCKET_API bool crocket_socket_get_port(const socket_t sock, unsigned short* port);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
