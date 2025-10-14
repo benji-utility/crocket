@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up build environment
+      - name: Set up build environment (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
@@ -30,10 +30,12 @@ jobs:
           choco install make mingw
         shell: pwsh
 
-      - name: Build library and tests
+      - name: Build library and tests (Linux)
+        if: matrix.os == "ubuntu-latest"
         run: make all
         shell: bash
 
-      - name: Show build output
-        run: ls -R build
-        shell: bash
+      - name: Build library and tests (Windows)
+        if: matrix.os == "windows-latest"
+        run: make all
+        shell: pwsh
