@@ -1,117 +1,342 @@
 #include "socket.h"
 
-CROCKET_API bool crocket_socket_init(crocket_socket_t* sock) {
-    sock->self = socket(AF_INET, SOCK_STREAM, 0);
+CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int type, int protocol) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
 
-    if (sock->self == CROCKET_INVALID_SOCKET) {
-        #if defined(CROCKET_WINDOWS)
-            int error_code = WSAGetLastError();
-
-            if (error_code == WSANOTINITIALISED) {
-                _crocket_update_error_context(
-                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                    "Operation not permitted, Winsock not initialized"
-                );
-            }
-            else {
-                _crocket_update_error_context(
-                    error_code,
-                    "Failed to create socket"
-                );
-            }
-        #elif defined(CROCKET_LINUX)
-            _crocket_update_error_context(errno, strerror(errno));
-        #endif
-
-        return false;
-    }
-
-    // set to placeholder value till true assignment during binding
-    sock->port = CROCKET_SOCKET_PORT_PLACEHOLDER_VALUE;
-
-    return true;
-}
-
-CROCKET_API bool crocket_socket_bind_any(crocket_socket_t* sock) {
-    return crocket_socket_bind_to(sock, NULL, CROCKET_SOCKET_EPHEMERAL_PORT);
-}
-
-CROCKET_API bool crocket_socket_bind_to(crocket_socket_t* sock, const char* address, const uint16_t port) {
-    struct sockaddr_in socket_address;
-
-    memset(&socket_address, 0, sizeof(socket_address));
-
-    socket_address.sin_family = AF_INET;
-    socket_address.sin_port = htons(port);
-
-    _CROCKET_SOCKADDR_IN_ADDRESS(socket_address) = address ? inet_addr(address) : INADDR_ANY;
-
-    if (bind(sock->self, (struct sockaddr*) &socket_address, sizeof(socket_address)) == SOCKET_ERROR) {
-        #if defined(CROCKET_WINDOWS)
-            int error_code = WSAGetLastError();
-
-            if (error_code == WSANOTINITIALISED) {
-                _crocket_update_error_context(
-                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                    "Operation not permitted, Winsock not initialized"
-                );
-            }
-            else {
-                _crocket_update_error_context(
-                    error_code,
-                    "Failed to bind socket to arbitrary port"
-                );
-            }
-        #elif defined(CROCKET_LINUX)
-            _crocket_update_error_context(errno, strerror(errno));
-        #endif
-
-        return false;
-    }
-
-    if (port == CROCKET_SOCKET_EPHEMERAL_PORT) {
-        socklen_t socket_address_length = sizeof(socket_address);
-
-        getsockname(sock->self, (struct sockaddr*) &socket_address, &socket_address_length);
-
-        sock->port = socket_address.sin_port;
-    }
-    else {
-        sock->port = port;
-    }
-
-    return true;
-}
-
-CROCKET_API bool crocket_socket_close(crocket_socket_t* sock) {
-    #if defined(CROCKET_WINDOWS)
-        int return_code = closesocket(sock->self);
-    #elif defined(CROCKET_LINUX)
-        int return_code = close(sock->self);
+            return false;
+        }
     #endif
 
-    if (return_code == SOCKET_ERROR) {
-        #if defined(CROCKET_WINDOWS)
-            int error_code = WSAGetLastError();
+    sock->handle = socket(address_family, type, protocol);
 
-            if (error_code == WSANOTINITIALISED) {
-                _crocket_update_error_context(
-                    CROCKET_ERROR_WINSOCK_NOT_INITIALIZED,
-                    "Operation not permitted, Winsock not initialized"
-                );
-            }
-            else {
-                _crocket_update_error_context(
-                    error_code,
-                    "Failed to create socket"
-                );
-            }
-        #elif defined(CROCKET_LINUX)
-            _crocket_update_error_context(errno, strerror(errno));
-        #endif
+    if (sock->handle == CROCKET_INVALID_SOCKET) {
+        // todo: collect error info
 
         return false;
     }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_close(socket_t* sock) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock) {
+        return false;
+    }
+
+    #if defined(CROCKET_WINDOWS)
+        closesocket(sock->handle);
+    #elif defined(CROCKET_LINUX)
+        if (close(sock->handle) != CROCKET_SUCCESS) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    sock->handle = CROCKET_INVALID_SOCKET;
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_set_address(socket_t* sock, int address_family, const char* ip, unsigned short port) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock) {
+        return false;
+    }
+
+    memset(&sock->address, 0, sizeof(sock->address));
+
+    sock->address.sin_family = address_family;
+    sock->address.sin_port = port == CROCKET_PORT_ANY ? 0 : htons(port);
+
+    if (ip == CROCKET_IP_ANY) {
+        _CROCKET_SOCKADDR_IN_ADDRESS(sock->address) = INADDR_ANY;
+    }
+    else if (inet_pton(address_family, ip, &sock->address.sin_addr) != _CROCKET_INET_PTON_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_set_address_any(socket_t* sock, int address_family) {
+    return crocket_socket_set_address(sock, address_family, CROCKET_IP_ANY, CROCKET_PORT_ANY);
+}
+
+CROCKET_API bool crocket_socket_bind(socket_t* sock) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (bind(sock->handle, (struct sockaddr*) &sock->address, sizeof(sock->address)) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_listen(socket_t* sock, size_t backlog) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (backlog > SOMAXCONN) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (listen(sock->handle, backlog) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_accept(socket_t* server_socket, socket_t* client_socket) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!server_socket || !client_socket) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    struct sockaddr_in client_address;
+
+    socklen_t address_length = sizeof(client_address);
+
+    socket_handle_t client_handle = accept(
+        server_socket->handle,
+        (struct sockaddr*) &client_address,
+        &address_length
+    );
+
+    if (client_handle == CROCKET_INVALID_SOCKET) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    client_socket->handle = client_handle;
+    client_socket->address = client_address;
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_connect(socket_t* sock) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (connect(sock->handle, (struct sockaddr*) &sock->address, sizeof(sock->address)) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_send(socket_t* sock, void* data, size_t data_length, int flags) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock || !data || data_length == 0) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    size_t bytes_sent = send(sock->handle, data, data_length, flags);
+
+    if (bytes_sent == -1) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_receive(socket_t* sock, char** data_buffer, size_t* buffer_capacity, size_t* bytes_received, int flags) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!sock || *buffer_capacity == 0) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    *bytes_received = 0;
+
+    while (true) {
+        char chunk[_CROCKET_RECV_CHUNK_SIZE];
+
+        ssize_t received = recv(sock->handle, chunk, sizeof(chunk), flags);
+
+        if (received < 0) {
+            // todo: collect error info
+
+            return false;
+        }
+
+        if (received == 0) break; // connection closed
+
+        if (*bytes_received + received > *buffer_capacity) {
+            size_t new_size = *buffer_capacity * 2;
+
+            while (*bytes_received + received > new_size) {
+                new_size *= 2;
+            }
+
+            char* new_buffer = realloc(*data_buffer, new_size);
+
+            if (!new_buffer) {
+                // todo: collect error info
+
+                return false;
+            }
+
+            *data_buffer = new_buffer;
+
+            *buffer_capacity = new_size;
+        }
+
+        memcpy(*data_buffer + *bytes_received, chunk, received);
+
+        *bytes_received += received;
+
+        if ((size_t) received < sizeof(chunk)) break;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_get_ip(const socket_t sock, int address_family, char* buffer, size_t buffer_size) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    if (!buffer || buffer_size == 0) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    struct sockaddr_in address;
+
+    socklen_t address_length = sizeof(address);
+
+    if (getsockname(sock.handle, (struct sockaddr*) &address, &address_length) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    if (!inet_ntop(address_family, &address.sin_addr, buffer, (socklen_t) buffer_size)) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    return true;
+}
+
+CROCKET_API bool crocket_socket_get_port(const socket_t sock, unsigned short* port) {
+    #ifdef CROCKET_WINDOWS
+        if (!winsock_init()) {
+            // todo: collect error info
+
+            return false;
+        }
+    #endif
+
+    struct sockaddr_in address;
+
+    socklen_t address_length = sizeof(address);
+
+    if (getsockname(sock.handle, (struct sockaddr*) &address, &address_length) != CROCKET_SUCCESS) {
+        // todo: collect error info
+
+        return false;
+    }
+
+    *port = ntohs(address.sin_port);
 
     return true;
 }

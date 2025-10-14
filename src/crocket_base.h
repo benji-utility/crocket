@@ -1,10 +1,12 @@
 #ifndef __CROCKET_BASE_H
 #define __CROCKET_BASE_H
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "platform.h"
-#include "error.h"
 
 #if defined(CROCKET_WINDOWS)
     #pragma comment(lib, "ws2_32.lib")
@@ -15,48 +17,47 @@
 
     #include <winsock2.h>
     #include <ws2tcpip.h>
+    #include <windows.h>
 
     #ifndef CROCKET_API
-        #define CROCKET_API WINAPI
+        #define CROCKET_API WSAAPI
     #endif
 
-    #ifndef CROCKET_SOCKET_ERROR
-        #define CROCKET_SOCKET_ERROR SOCKET_ERROR
-    #endif
-
-    #ifndef CROCKET_INVALID_SOCKET
-        #define CROCKET_INVALID_SOCKET INVALID_SOCKET
-    #endif
-
-    #ifndef _CROCKET_SOCKADDR_IN_ADDRESS
-        #define _CROCKET_SOCKADDR_IN_ADDRESS(_sockaddr_in) (_sockaddr_in.sin_addr.S_un.S_addr)
-    #endif
+    typedef SOCKET socket_handle_t;
 #elif defined(CROCKET_LINUX)
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+    #include <unistd.h>
     #include <errno.h>
 
     #ifndef CROCKET_API
         #define CROCKET_API
     #endif
 
-    // linux does not have a default socket type so we rollin' our own
-    typedef unsigned long long SOCKET;
-
-    #ifndef CROCKET_SOCKET_ERROR
-        #define CROCKET_SOCKET_ERROR (-1)
-    #endif
-
-    #ifndef CROCKET_INVALID_SOCKET
-        #define CROCKET_INVALID_SOCKET (CROCKET_SOCKET)(~0)
-    #endif
-
-    #ifndef _CROCKET_SOCKADDR_IN_ADDRESS
-        #define _CROCKET_SOCKADDR_IN_ADDRESS(_sockaddr_in) (_sockaddr_in.sin_addr.s_addr)
-    #endif
+    typedef int socket_handle_t;
 #endif
 
-#ifdef CROCKET_WINDOWS
-    CROCKET_API bool crocket_winsock_init();
-    CROCKET_API bool crocket_winsock_cleanup();
+#ifndef CROCKET_SUCCESS
+    #define CROCKET_SUCCESS (0)
+#endif
+
+#ifndef CROCKET_NO_FLAGS
+    #define CROCKET_NO_FLAGS (0)
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(CROCKET_WINDOWS)
+    CROCKET_API bool winsock_init();
+    CROCKET_API bool winsock_cleanup();
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

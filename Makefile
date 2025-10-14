@@ -3,48 +3,54 @@ GXX := gcc
 GXX_FLAGS := -g -Wno-discarded-qualifiers
 
 SRC := src
-TESTS := tests
 BUILD := build
+OBJ := $(BUILD)/obj
 
 SRCS := $(wildcard $(SRC)/*.c)
-TESTS_SRCS := $(wildcard $(TESTS)/*.c)
+OBJS := $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 
-OBJS := $(patsubst $(SRC)/%.c, $(BUILD)/%.o, $(SRCS))
+TEST_DIR := tests
+TEST_OBJ := $(OBJ)/$(TEST_DIR)
+TEST_SRCS := $(wildcard $(TEST_DIR)/*.c)
+TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(TEST_OBJ)/%.o, $(TEST_SRCS))
+TEST_BIN := $(patsubst $(TEST_DIR)/%.c, $(BUILD)/%, $(TEST_SRCS))
 
-TESTS_LINKED_LIBS := -lWs2_32
+ifeq ($(OS), Windows_NT)
+	LINKED_LIBS := -lWs2_32
+else
+	LINKED_LIBS :=
+endif
 
-# STATIC_LIB := $(BUILD)/libcrocket.a
+LIB := $(BUILD)/libcrocket.a
 
-# all: clean $(STATIC_LIB)
-all: clean
+.PHONY: all clean mkbuild
 
-# $(STATIC_LIB): $(OBJS)
-# 	ar rcs $@ $^
+all: mkbuild $(LIB) $(TEST_BIN)
 
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
-ifeq ($(OS), Windows_NT)
-.SILENT: clean
-endif
+$(TEST_OBJ)/%.o: $(TEST_DIR)/%.c
+	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
-.PHONY: clean mkbuild
+$(LIB): $(OBJS)
+	ar rcs $@ $(OBJS)
+
+$(BUILD)/%: $(TEST_OBJ)/%.o $(LIB)
+	$(GXX) $(GXX_FLAGS) -o $@ $< -L$(BUILD) -lcrocket $(LINKED_LIBS)
+
+mkbuild:
+ifeq ($(OS), Windows_NT)
+	if not exist "$(BUILD)" mkdir "$(BUILD)"
+	if not exist "$(OBJ)" mkdir "$(OBJ)"
+	if not exist "$(TEST_OBJ)" mkdir "$(TEST_OBJ)"
+else
+	mkdir -p $(BUILD) $(OBJ) $(TEST_OBJ)
+endif
 
 clean: mkbuild
 ifeq ($(OS), Windows_NT)
 	del /Q /S $(BUILD)\*
 else
-	find $(BUILD) -maxdepth 1 -type f -exec rm {} \;
-	rm -rf $(OBJ)/*
+	rm -rf $(BUILD)/*
 endif
-
-mkbuild:
-ifeq ($(OS), Windows_NT)
-	if not exist "$(BUILD)" mkdir "$(BUILD)"
-else
-	mkdir -p $(BUILD)
-	mkdir -p $(OBJ)
-endif
-
-test: clean
-	$(GXX) $(GXX_FLAGS) $(SRCS) $(TESTS_SRCS) -o $(BUILD)/tests $(TESTS_LINKED_LIBS)
