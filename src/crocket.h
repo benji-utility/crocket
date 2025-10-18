@@ -4,5 +4,6 @@
 #include "crocket_base.h"
 
 #include "socket.h"
+#include "error_context.h"
 
 #endif

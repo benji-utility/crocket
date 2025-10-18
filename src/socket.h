@@ -2,6 +2,7 @@
 #define __CROCKET_SOCKET_H
 
 #include "crocket_base.h"
+#include "error_context.h"
 
 #if defined(CROCKET_WINDOWS)
     #ifndef CROCKET_INVALID_SOCKET
