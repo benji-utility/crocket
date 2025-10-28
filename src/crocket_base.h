@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "error_context.h"
 #include "platform.h"
 
 #if defined(CROCKET_WINDOWS)
@@ -50,6 +51,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+CROCKET_API bool crocket_init();
 
 #if defined(CROCKET_WINDOWS)
     CROCKET_API bool winsock_init();

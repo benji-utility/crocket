@@ -12,7 +12,15 @@ CROCKET_API bool crocket_socket_init(socket_t* sock, int address_family, int typ
     sock->handle = socket(address_family, type, protocol);
 
     if (sock->handle == CROCKET_INVALID_SOCKET) {
-        // todo: collect error info
+        #if defined(CROCKET_WINDOWS)
+        #elif defined(CROCKET_LINUX)
+            _crocket_update_error_context(
+                CROCKET_ERROR_SOCKET_INIT_FAILED,
+                "Failed to initiate socket (errno(%d): '%s')",
+                errno,
+                strerror(errno)
+            );
+        #endif
 
         return false;
     }
@@ -70,7 +78,7 @@ CROCKET_API bool crocket_socket_set_address(socket_t* sock, int address_family, 
         _CROCKET_SOCKADDR_IN_ADDRESS(sock->address) = INADDR_ANY;
     }
     else if (inet_pton(address_family, ip, &sock->address.sin_addr) != _CROCKET_INET_PTON_SUCCESS) {
-        // todo: collect error info
+        _crocket_update_error_context(errno, strerror(errno));
 
         return false;
     }

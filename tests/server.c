@@ -11,7 +11,11 @@ int main(void) {
     socket_t server_socket;
 
     if (!crocket_socket_init(&server_socket, AF_INET, SOCK_STREAM, CROCKET_SOCKET_PROTOCOL_ANY)) {
-        printf("Failed to init server socket\n");
+        printf(
+            "Failed to init server socket (%d) - '%s'\n",
+            crocket_get_last_error_code(),
+            crocket_get_last_error_message()
+        );
 
         #ifdef CROCKET_WINDOWS
             winsock_cleanup();
@@ -21,7 +25,11 @@ int main(void) {
     }
 
     if (!crocket_socket_set_address(&server_socket, AF_INET, "127.0.0.1", CROCKET_PORT_ANY)) {
-        printf("Failed to set server socket address\n");
+        printf(
+            "Failed to set server socket address (%d) - '%s'\n",
+            crocket_get_last_error_code(),
+            crocket_get_last_error_message()
+        );
 
         #ifdef CROCKET_WINDOWS
             winsock_cleanup();

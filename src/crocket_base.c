@@ -1,5 +1,17 @@
 #include "crocket_base.h"
 
+CROCKET_API bool crocket_init() {
+    bool result = false;
+
+    #ifdef CROCKET_WINDOWS
+        result |= winsock_init();
+    #endif
+
+    result |= crocket_error_context_init();
+
+    return result;
+}
+
 #if defined(CROCKET_WINDOWS)
     static bool _crocket_is_winsock_initialized = false;
 
